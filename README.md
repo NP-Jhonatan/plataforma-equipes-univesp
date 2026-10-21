@@ -95,7 +95,8 @@ Navegável pelo próprio navegador em `/api/`. Leitura é pública; escrita exig
 1. Crie uma conta em https://render.com entrando com o GitHub.
 2. No painel, clique em **New → Blueprint** e selecione este repositório.
 3. O Render lê o `render.yaml`, cria o banco PostgreSQL e o serviço web, e executa o `build.sh` (instala dependências, migra o banco e cadastra as competências).
-4. Para carregar os dados de demonstração, abra o **Shell** do serviço e rode `python manage.py popular_dados --demo`. Para o admin, `python manage.py createsuperuser`.
+4. Os dados de demonstração são carregados automaticamente no build, pela variável `DEMO_DATA=True` do `render.yaml` (o plano gratuito não tem Shell).
+5. Para criar o administrador (`/admin/`), adicione em **Environment** do serviço as variáveis `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL` e `DJANGO_SUPERUSER_PASSWORD` e faça um novo deploy (**Manual Deploy → Deploy latest commit**). A senha fica só no Render, nunca no repositório.
 
 No plano gratuito, o serviço “dorme” após 15 minutos sem acesso (a primeira visita depois disso demora cerca de 1 minuto) e o banco gratuito expira 30 dias após a criação. Para as apresentações, acesse o site alguns minutos antes.
 

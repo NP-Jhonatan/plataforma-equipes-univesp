@@ -26,3 +26,6 @@ services:
         value: "False"
       - key: WEB_CONCURRENCY
         value: "2"
+      # Dados de demonstração para apresentações e testes. Mude para "False" se não quiser.
+      - key: DEMO_DATA
+        value: "True"
