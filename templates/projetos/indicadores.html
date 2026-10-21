@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block titulo %}Indicadores{% endblock %}
+{% block conteudo %}
+<h1 class="h2 fw-bold">Indicadores da plataforma</h1>
+<p class="text-body-secondary">Dados agregados e anônimos de uso, atualizados em tempo real.</p>
+
+<section aria-labelledby="sec-numeros" class="mb-5">
+  <h2 id="sec-numeros" class="visually-hidden">Números gerais</h2>
+  <dl class="row row-cols-2 row-cols-md-5 g-3 numeros">
+    <div class="col"><div class="card card-body h-100"><dt>Projetos publicados</dt><dd>{{ total_projetos }}</dd></div></div>
+    <div class="col"><div class="card card-body h-100"><dt>Com vagas abertas</dt><dd>{{ projetos_abertos }}</dd></div></div>
+    <div class="col"><div class="card card-body h-100"><dt>Equipes com membros</dt><dd>{{ equipes_formadas }}</dd></div></div>
+    <div class="col"><div class="card card-body h-100"><dt>Pedidos de participação</dt><dd>{{ total_interesses }}</dd></div></div>
+    <div class="col"><div class="card card-body h-100"><dt>Taxa de aceite</dt><dd>{% if taxa_aceite is not None %}{{ taxa_aceite }}%{% else %}—{% endif %}</dd></div></div>
+  </dl>
+</section>
+
+<section aria-labelledby="sec-competencias" class="mb-5">
+  <h2 id="sec-competencias" class="h4">Competências: procura × oferta</h2>
+  <p class="text-body-secondary">Procura = projetos que pedem a competência. Oferta = estudantes que a informaram no perfil.</p>
+  {% if competencias %}
+  <div class="legenda d-flex gap-3 small mb-2" aria-hidden="true">
+    <span><span class="amostra amostra-procura"></span> Procura</span>
+    <span><span class="amostra amostra-oferta"></span> Oferta</span>
+  </div>
+  <table class="table tabela-barras align-middle">
+    <caption class="visually-hidden">Competências mais procuradas em projetos comparadas ao número de estudantes que as oferecem</caption>
+    <thead><tr><th scope="col">Competência</th><th scope="col">Procura</th><th scope="col">Oferta</th><th scope="col" class="d-none d-md-table-cell"><span class="visually-hidden">Gráfico</span></th></tr></thead>
+    <tbody>
+    {% for c in competencias %}
+      <tr>
+        <th scope="row"><a href="{% url 'projetos:lista' %}?competencia={{ c.slug }}">{{ c.nome }}</a></th>
+        <td>{{ c.procura }}</td>
+        <td>{{ c.oferta }}</td>
+        <td class="d-none d-md-table-cell w-50" aria-hidden="true">
+          <div class="barra barra-procura" style="width: {{ c.pct_procura }}%"></div>
+          <div class="barra barra-oferta" style="width: {{ c.pct_oferta }}%"></div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="text-body-secondary">Ainda não há dados suficientes.</p>{% endif %}
+</section>
+
+<section aria-labelledby="sec-tipos">
+  <h2 id="sec-tipos" class="h4">Projetos por tipo</h2>
+  <ul>
+    {% for t in por_tipo %}<li>{% for chave, rotulo in rotulos_tipo.items %}{% if chave == t.tipo %}{{ rotulo }}{% endif %}{% endfor %}: {{ t.total }}</li>
+    {% empty %}<li>Nenhum projeto publicado.</li>{% endfor %}
+  </ul>
+</section>
+{% endblock %}

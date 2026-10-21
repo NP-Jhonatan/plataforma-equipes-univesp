@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load form_extras %}
+{% block titulo %}Explorar projetos{% endblock %}
+{% block conteudo %}
+<section class="destaque mb-4" aria-labelledby="titulo-pagina">
+  <div class="row align-items-center g-3">
+    <div class="col-lg-8">
+      <h1 id="titulo-pagina" class="display-6 fw-bold">Encontre um projeto ou monte sua equipe</h1>
+      <p class="lead mb-0">Ideias de projetos acadêmicos e extracurriculares divulgadas por estudantes da Univesp, de todos os polos, em um só lugar.</p>
+    </div>
+    <div class="col-lg-4 text-lg-end">
+      {% if user.is_authenticated %}
+        <a href="{% url 'projetos:criar' %}" class="btn btn-primario btn-lg">Divulgar minha ideia</a>
+      {% else %}
+        <a href="{% url 'contas:cadastro' %}" class="btn btn-primario btn-lg">Criar conta e participar</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<form method="get" class="filtros card card-body mb-4" role="search" aria-label="Buscar e filtrar projetos">
+  <div class="row g-3 align-items-end">
+    <div class="col-md-5">
+      <label for="id_q" class="form-label fw-semibold">{{ filtro.q.label }}</label>
+      {{ filtro.q|campo_acessivel }}
+    </div>
+    <div class="col-md-3">
+      <label for="id_competencia" class="form-label fw-semibold">{{ filtro.competencia.label }}</label>
+      {{ filtro.competencia|campo_acessivel:"form-select" }}
+    </div>
+    <div class="col-md-2">
+      <label for="id_tipo" class="form-label fw-semibold">{{ filtro.tipo.label }}</label>
+      {{ filtro.tipo|campo_acessivel:"form-select" }}
+    </div>
+    <div class="col-md-2 d-grid">
+      <button type="submit" class="btn btn-primario">Filtrar</button>
+    </div>
+    <div class="col-12 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <div class="form-check mb-0">
+        {{ filtro.abertos|campo_acessivel:"form-check-input" }}
+        <label class="form-check-label" for="id_abertos">{{ filtro.abertos.label }}</label>
+      </div>
+      {% if filtrando %}<a href="{% url 'projetos:lista' %}" class="small">Limpar filtros</a>{% endif %}
+    </div>
+  </div>
+</form>
+
+<h2 class="visually-hidden">Resultados</h2>
+<p class="text-body-secondary" role="status">
+  {% with total=paginator.count|default:0 %}{{ total }} projeto{{ total|pluralize }} encontrado{{ total|pluralize }}{% endwith %}
+</p>
+
+{% if projetos %}
+<div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+  {% for projeto in projetos %}<div class="col">{% include "projetos/_card.html" %}</div>{% endfor %}
+</div>
+{% if is_paginated %}
+<nav class="mt-4" aria-label="Paginação dos projetos">
+  <ul class="pagination justify-content-center">
+    {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="{% url_pagina page_obj.previous_page_number %}">Anterior</a></li>{% endif %}
+    {% for n in paginator.page_range %}
+      <li class="page-item {% if n == page_obj.number %}active{% endif %}">
+        <a class="page-link" href="{% url_pagina n %}" {% if n == page_obj.number %}aria-current="page"{% endif %}><span class="visually-hidden">Página </span>{{ n }}</a>
+      </li>
+    {% endfor %}
+    {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="{% url_pagina page_obj.next_page_number %}">Próxima</a></li>{% endif %}
+  </ul>
+</nav>
+{% endif %}
+{% else %}
+<div class="estado-vazio text-center py-5">
+  <p class="h5">Nenhum projeto encontrado.</p>
+  <p class="text-body-secondary">{% if filtrando %}Tente outros termos ou remova filtros.{% else %}Seja o primeiro a divulgar uma ideia!{% endif %}</p>
+  {% if user.is_authenticated %}<a class="btn btn-primario" href="{% url 'projetos:criar' %}">Divulgar ideia</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

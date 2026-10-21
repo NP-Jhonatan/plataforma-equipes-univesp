@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block titulo %}Meu painel{% endblock %}
+{% block conteudo %}
+<h1 class="h2 fw-bold mb-4">Meu painel</h1>
+
+<section class="mb-5" aria-labelledby="sec-meus-projetos">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 id="sec-meus-projetos" class="h4 mb-0">Projetos que divulguei</h2>
+    <a class="btn btn-primario btn-sm" href="{% url 'projetos:criar' %}">Divulgar nova ideia</a>
+  </div>
+  {% if meus_projetos %}
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <caption class="visually-hidden">Seus projetos, com situação e número de interessados</caption>
+      <thead><tr><th scope="col">Projeto</th><th scope="col">Situação</th><th scope="col">Equipe</th><th scope="col">Pedidos pendentes</th></tr></thead>
+      <tbody>
+      {% for p in meus_projetos %}
+        <tr>
+          <th scope="row"><a href="{{ p.get_absolute_url }}">{{ p.titulo }}</a></th>
+          <td><span class="badge rounded-pill etiqueta-status status-{{ p.status }}">{{ p.get_status_display }}</span></td>
+          <td>{{ p.n_membros }} de {{ p.vagas }}</td>
+          <td>{% if p.n_pendentes %}<a href="{{ p.get_absolute_url }}#sec-pendentes" class="fw-semibold">{{ p.n_pendentes }} para responder</a>{% else %}—{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-body-secondary">Você ainda não divulgou nenhuma ideia.</p>
+  {% endif %}
+</section>
+
+<section aria-labelledby="sec-meus-interesses">
+  <h2 id="sec-meus-interesses" class="h4 mb-3">Projetos em que manifestei interesse</h2>
+  {% if meus_interesses %}
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <caption class="visually-hidden">Seus pedidos de participação e a situação de cada um</caption>
+      <thead><tr><th scope="col">Projeto</th><th scope="col">Autor</th><th scope="col">Situação</th><th scope="col"><span class="visually-hidden">Ações</span></th></tr></thead>
+      <tbody>
+      {% for i in meus_interesses %}
+        <tr>
+          <th scope="row"><a href="{{ i.projeto.get_absolute_url }}">{{ i.projeto.titulo }}</a></th>
+          <td>{{ i.projeto.autor.get_full_name|default:i.projeto.autor.username }}</td>
+          <td><span class="badge status-interesse-{{ i.status }}">{{ i.get_status_display }}</span></td>
+          <td class="text-end">
+            {% if i.status == "pendente" %}
+            <form method="post" action="{% url 'projetos:cancelar_interesse' i.pk %}">{% csrf_token %}
+              <input type="hidden" name="proximo" value="{% url 'projetos:painel' %}">
+              <button class="btn btn-link btn-sm p-0">Retirar<span class="visually-hidden"> interesse em {{ i.projeto.titulo }}</span></button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="text-body-secondary">Você ainda não manifestou interesse em nenhum projeto. <a href="{% url 'projetos:lista' %}">Explorar projetos</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

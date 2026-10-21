@@ -1,0 +1,28 @@
+# Blueprint do Render: cria o serviço web e o banco PostgreSQL.
+# No painel do Render: New > Blueprint > selecione este repositório.
+databases:
+  - name: equipes-db
+    plan: free
+    databaseName: equipes
+    user: equipes
+
+services:
+  - type: web
+    name: equipes-univesp
+    runtime: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn config.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: equipes-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: WEB_CONCURRENCY
+        value: "2"

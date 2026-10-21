@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block titulo %}{{ perfil.nome_exibicao }}{% endblock %}
+{% block conteudo %}
+<div class="row g-4">
+  <section class="col-lg-4" aria-labelledby="nome-perfil">
+    <div class="card card-body">
+      <div class="avatar mb-3" aria-hidden="true">{{ perfil.nome_exibicao|slice:":1"|upper }}</div>
+      <h1 id="nome-perfil" class="h3 fw-bold mb-1">{{ perfil.nome_exibicao }}</h1>
+      <p class="text-body-secondary mb-3">@{{ usuario_perfil.username }}</p>
+      <dl class="mb-0">
+        <dt>Curso</dt><dd>{{ perfil.curso|default:"Não informado" }}</dd>
+        <dt>Polo</dt><dd>{{ perfil.polo|default:"Não informado" }}</dd>
+        {% if contato_visivel %}<dt>Contato</dt><dd>{{ perfil.contato|default:usuario_perfil.email }}</dd>{% endif %}
+      </dl>
+      {% if user == usuario_perfil %}<a class="btn btn-outline-secondary btn-sm mt-3" href="{% url 'contas:editar_perfil' %}">Editar perfil</a>{% endif %}
+    </div>
+  </section>
+  <div class="col-lg-8">
+    {% if perfil.bio %}
+    <section class="mb-4" aria-labelledby="sec-bio"><h2 id="sec-bio" class="h5">Sobre</h2><p>{{ perfil.bio|linebreaksbr }}</p></section>
+    {% endif %}
+    <section class="mb-4" aria-labelledby="sec-comp">
+      <h2 id="sec-comp" class="h5">Competências</h2>
+      {% if perfil.competencias.all %}
+      <ul class="list-unstyled d-flex flex-wrap gap-2">{% for c in perfil.competencias.all %}<li class="chip">{{ c.nome }}</li>{% endfor %}</ul>
+      {% else %}<p class="text-body-secondary">Nenhuma competência informada.</p>{% endif %}
+    </section>
+    {% if perfil.lista_interesses %}
+    <section class="mb-4" aria-labelledby="sec-int">
+      <h2 id="sec-int" class="h5">Interesses</h2>
+      <ul class="list-unstyled d-flex flex-wrap gap-2">{% for i in perfil.lista_interesses %}<li class="chip chip-claro">{{ i }}</li>{% endfor %}</ul>
+    </section>
+    {% endif %}
+    <section aria-labelledby="sec-proj">
+      <h2 id="sec-proj" class="h5">Projetos divulgados</h2>
+      {% if projetos %}
+      <ul>{% for p in projetos %}<li><a href="{{ p.get_absolute_url }}">{{ p.titulo }}</a> <span class="text-body-secondary small">({{ p.get_status_display }})</span></li>{% endfor %}</ul>
+      {% else %}<p class="text-body-secondary">Nenhum projeto divulgado.</p>{% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+<article class="card cartao-projeto h-100">
+  <div class="card-body d-flex flex-column">
+    <div class="d-flex flex-wrap gap-1 mb-2">
+      <span class="badge rounded-pill etiqueta-tipo">{{ projeto.get_tipo_display }}</span>
+      <span class="badge rounded-pill etiqueta-status status-{{ projeto.status }}">{{ projeto.get_status_display }}</span>
+    </div>
+    <h2 class="h5 card-title">
+      <a href="{{ projeto.get_absolute_url }}" class="stretched-link link-titulo">{{ projeto.titulo }}</a>
+    </h2>
+    <p class="card-text text-body-secondary">{{ projeto.resumo }}</p>
+    {% if projeto.competencias_desejadas.all %}
+    <p class="visually-hidden">Competências procuradas:</p>
+    <ul class="list-unstyled d-flex flex-wrap gap-1 mb-3">
+      {% for c in projeto.competencias_desejadas.all|slice:":5" %}<li class="chip">{{ c.nome }}</li>{% endfor %}
+      {% if projeto.competencias_desejadas.all|length > 5 %}<li class="chip chip-mais">+{{ projeto.competencias_desejadas.all|length|add:"-5" }}</li>{% endif %}
+    </ul>
+    {% endif %}
+    <p class="small text-body-secondary mt-auto mb-0">
+      Por {{ projeto.autor.get_full_name|default:projeto.autor.username }} ·
+      {% if projeto.status == "aberto" %}{{ projeto.vagas_restantes }} vaga{{ projeto.vagas_restantes|pluralize }} restante{{ projeto.vagas_restantes|pluralize }}{% else %}sem vagas abertas{% endif %}
+    </p>
+  </div>
+</article>

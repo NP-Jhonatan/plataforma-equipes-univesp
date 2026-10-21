@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block titulo %}Editar perfil{% endblock %}
+{% block conteudo %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <h1 class="h2 fw-bold">Editar perfil</h1>
+    <p class="text-body-secondary">Essas informações ajudam outros estudantes a encontrar você para formar equipes.</p>
+    {% include "includes/form_erros.html" with form=form_usuario %}
+    {% include "includes/form_erros.html" with form=form_perfil %}
+    <form method="post" class="card card-body" novalidate>
+      {% csrf_token %}
+      <fieldset class="mb-2">
+        <legend class="h5">Dados pessoais</legend>
+        <div class="row">
+          <div class="col-sm-6">{% include "includes/campo.html" with campo=form_usuario.first_name %}</div>
+          <div class="col-sm-6">{% include "includes/campo.html" with campo=form_usuario.last_name %}</div>
+        </div>
+        {% include "includes/campo.html" with campo=form_usuario.email %}
+      </fieldset>
+      <fieldset class="mb-2">
+        <legend class="h5">Vida acadêmica</legend>
+        <div class="row">
+          <div class="col-sm-6">{% include "includes/campo.html" with campo=form_perfil.curso %}</div>
+          <div class="col-sm-6">{% include "includes/campo.html" with campo=form_perfil.polo %}</div>
+        </div>
+        {% include "includes/campo.html" with campo=form_perfil.bio %}
+        {% include "includes/campo.html" with campo=form_perfil.interesses %}
+        {% include "includes/campo.html" with campo=form_perfil.competencias %}
+        {% include "includes/campo.html" with campo=form_perfil.novas_competencias %}
+        {% include "includes/campo.html" with campo=form_perfil.contato %}
+      </fieldset>
+      <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primario">Salvar perfil</button>
+        <a href="{% url 'contas:perfil' user.username %}" class="btn btn-outline-secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

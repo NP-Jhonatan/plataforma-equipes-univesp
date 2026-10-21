@@ -1,0 +1,99 @@
+{% load static %}<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Plataforma colaborativa para divulgar ideias e formar equipes de projetos entre estudantes da Univesp.">
+  <title>{% block titulo %}Início{% endblock %} · Equipes Univesp</title>
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/estilo.css' %}">
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <script>
+    // Aplica preferências de acessibilidade antes da renderização (evita "piscar").
+    try {
+      if (localStorage.getItem("altoContraste") === "1") document.documentElement.classList.add("alto-contraste");
+      var f = localStorage.getItem("tamanhoFonte"); if (f) document.documentElement.style.fontSize = f + "%";
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <!-- Barra de acessibilidade (eMAG): atalhos de teclado e ajustes de leitura -->
+  <div class="barra-acessibilidade" role="region" aria-label="Recursos de acessibilidade">
+    <div class="container d-flex flex-wrap align-items-center gap-2 py-1">
+      <ul class="list-inline mb-0 me-auto">
+        <li class="list-inline-item"><a href="#conteudo" accesskey="1">Ir para o conteúdo <span aria-hidden="true">[1]</span></a></li>
+        <li class="list-inline-item"><a href="#menu" accesskey="2">Ir para o menu <span aria-hidden="true">[2]</span></a></li>
+        <li class="list-inline-item"><a href="{% url 'projetos:lista' %}#id_q" accesskey="3">Ir para a busca <span aria-hidden="true">[3]</span></a></li>
+      </ul>
+      <div class="d-flex gap-1" role="group" aria-label="Ajustes de leitura">
+        <button type="button" class="btn btn-sm btn-link" data-fonte="-10" aria-label="Diminuir tamanho do texto">A−</button>
+        <button type="button" class="btn btn-sm btn-link" data-fonte="0" aria-label="Tamanho de texto padrão">A</button>
+        <button type="button" class="btn btn-sm btn-link" data-fonte="10" aria-label="Aumentar tamanho do texto">A+</button>
+        <button type="button" class="btn btn-sm btn-link" id="btn-contraste" aria-pressed="false">Alto contraste</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-principal" id="menu" aria-label="Menu principal">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'projetos:lista' %}">
+          <span class="marca-icone" aria-hidden="true">◆</span> Equipes Univesp
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navConteudo"
+                aria-controls="navConteudo" aria-expanded="false" aria-label="Abrir menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navConteudo">
+          {% with rota=request.resolver_match.url_name %}
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item"><a class="nav-link {% if rota == 'lista' %}active{% endif %}" {% if rota == 'lista' %}aria-current="page"{% endif %} href="{% url 'projetos:lista' %}">Explorar projetos</a></li>
+            {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link {% if rota == 'criar' %}active{% endif %}" {% if rota == 'criar' %}aria-current="page"{% endif %} href="{% url 'projetos:criar' %}">Divulgar ideia</a></li>
+            <li class="nav-item"><a class="nav-link {% if rota == 'painel' %}active{% endif %}" {% if rota == 'painel' %}aria-current="page"{% endif %} href="{% url 'projetos:painel' %}">Meu painel</a></li>
+            {% endif %}
+            <li class="nav-item"><a class="nav-link {% if rota == 'indicadores' %}active{% endif %}" {% if rota == 'indicadores' %}aria-current="page"{% endif %} href="{% url 'projetos:indicadores' %}">Indicadores</a></li>
+          </ul>
+          {% endwith %}
+          <ul class="navbar-nav">
+            {% if user.is_authenticated %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'contas:perfil' user.username %}">Meu perfil ({{ user.first_name|default:user.username }})</a></li>
+            <li class="nav-item">
+              <form method="post" action="{% url 'logout' %}">{% csrf_token %}
+                <button type="submit" class="nav-link btn btn-link">Sair</button>
+              </form>
+            </li>
+            {% else %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Entrar</a></li>
+            <li class="nav-item"><a class="btn btn-light btn-sm ms-lg-2 mt-1 mt-lg-0" href="{% url 'contas:cadastro' %}">Criar conta</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main id="conteudo" tabindex="-1" class="container py-4">
+    <div id="avisos" aria-live="polite" aria-atomic="true">
+      {% for mensagem in messages %}
+      <div class="alert alert-{% if mensagem.tags == 'error' %}danger{% else %}{{ mensagem.tags }}{% endif %} alert-dismissible fade show" role="{% if mensagem.tags == 'error' %}alert{% else %}status{% endif %}">
+        {{ mensagem }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar aviso"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% block conteudo %}{% endblock %}
+  </main>
+
+  <footer class="rodape mt-5 py-4">
+    <div class="container small">
+      <p class="mb-1">Projeto Integrador em Computação II (PJI240) · Engenharia de Computação · Univesp · Polos Itapevi, Diadema e Mogi das Cruzes.</p>
+      <p class="mb-0">Protótipo acadêmico desenvolvido por estudantes; não é um serviço oficial da Univesp. <a href="{% url 'api:api-root' %}">API REST</a></p>
+    </div>
+  </footer>
+
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

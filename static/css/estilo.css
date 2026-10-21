@@ -1,0 +1,110 @@
+/* Equipes Univesp — estilos próprios sobre o Bootstrap 5.
+   Cores escolhidas com contraste mínimo de 4,5:1 (WCAG AA / eMAG). */
+
+:root {
+  --cor-primaria: #a3182c;
+  --cor-primaria-escura: #7d1121;
+  --cor-texto: #1d1f23;
+  --cor-suave: #f5f2f0;
+  --cor-chip: #ece6e2;
+  --cor-procura: #a3182c;
+  --cor-oferta: #2f5d8a;
+  --bs-link-color: #8f1426;
+  --bs-link-color-rgb: 143, 20, 38;
+  --bs-link-hover-color: #5e0d19;
+  --bs-link-hover-color-rgb: 94, 13, 25;
+}
+
+body { color: var(--cor-texto); background: #fcfbfa; }
+
+/* Foco sempre visível para navegação por teclado */
+:focus-visible {
+  outline: 3px solid #f2b705 !important;
+  outline-offset: 2px;
+  box-shadow: none !important;
+}
+#conteudo:focus { outline: none; }
+
+.barra-acessibilidade { background: #2a2a2a; font-size: .85rem; }
+.barra-acessibilidade a, .barra-acessibilidade .btn-link { color: #fff; text-decoration: none; }
+.barra-acessibilidade a:hover, .barra-acessibilidade .btn-link:hover { text-decoration: underline; }
+.barra-acessibilidade .btn-link { padding: .1rem .4rem; }
+
+.navbar-principal { background: var(--cor-primaria); }
+.navbar-principal .nav-link { color: rgba(255, 255, 255, .92); }
+.navbar-principal .nav-link.active { color: #fff; font-weight: 600; text-decoration: underline; text-underline-offset: 6px; }
+.marca-icone { color: #ffd3d9; margin-right: .2rem; }
+
+.btn-primario { background: var(--cor-primaria); color: #fff; border: 0; }
+.btn-primario:hover, .btn-primario:focus { background: var(--cor-primaria-escura); color: #fff; }
+
+.destaque { background: var(--cor-suave); border-radius: 1rem; padding: 2rem; }
+
+.cartao-projeto { border: 1px solid #e3ddd9; transition: box-shadow .15s, transform .15s; }
+.cartao-projeto:hover { box-shadow: 0 .5rem 1.25rem rgba(0, 0, 0, .08); transform: translateY(-2px); }
+.link-titulo { color: var(--cor-texto); text-decoration: none; }
+.link-titulo:hover { color: var(--cor-primaria); text-decoration: underline; }
+
+.etiqueta-tipo { background: #e9e4f2; color: #3b2c63; }
+.etiqueta-status { background: #e5e5e5; color: #333; }
+.etiqueta-status.status-aberto { background: #d8efe0; color: #13512b; }
+.etiqueta-status.status-andamento { background: #fff0c2; color: #5c4400; }
+.etiqueta-status.status-encerrado { background: #e5e5e5; color: #3b3b3b; }
+
+.status-interesse-pendente { background: #fff0c2; color: #5c4400; }
+.status-interesse-aceito { background: #d8efe0; color: #13512b; }
+.status-interesse-recusado { background: #e5e5e5; color: #3b3b3b; }
+
+.chip { display: inline-block; background: var(--cor-chip); color: #3a2a24; border-radius: 999px;
+        padding: .2rem .7rem; font-size: .85rem; }
+.chip-claro { background: #eef2f6; color: #1f3a52; }
+.chip-mais { background: transparent; border: 1px solid #cfc6c1; }
+.chip-link { text-decoration: none; }
+.chip-link:hover { background: #ddd2cc; text-decoration: underline; }
+
+/* Lista de checkboxes de competências em formato de "chips" */
+.opcoes-chips { display: flex; flex-wrap: wrap; gap: .4rem; max-height: 18rem; overflow-y: auto; padding: .25rem; }
+.opcoes-chips .form-check { background: var(--cor-chip); border-radius: 999px; padding: .3rem .8rem; margin: 0;
+                            display: flex; align-items: center; gap: .4rem; }
+.opcoes-chips .form-check input { width: 1rem; height: 1rem; accent-color: var(--cor-primaria); margin: 0; }
+.opcoes-chips .form-check:has(input:checked) { background: #f3d6db; outline: 1px solid var(--cor-primaria); }
+
+.mensagem-interesse { border-left: 4px solid var(--cor-chip); padding-left: .75rem; color: #444; margin: .5rem 0 1rem; }
+.painel-lateral { border-top: 4px solid var(--cor-primaria); }
+.lista-equipe li { padding: .35rem 0; border-bottom: 1px solid #eee; }
+.lista-equipe li:last-child { border-bottom: 0; }
+
+.avatar { width: 4rem; height: 4rem; border-radius: 50%; background: var(--cor-primaria); color: #fff;
+          display: grid; place-items: center; font-size: 1.75rem; font-weight: 700; }
+
+.numeros dt { font-weight: 500; font-size: .9rem; color: #555; }
+.numeros dd { font-size: 2rem; font-weight: 700; margin: 0; }
+.barra { height: .55rem; border-radius: 4px; margin: 2px 0; min-width: 2px; }
+.barra-procura, .amostra-procura { background: var(--cor-procura); }
+.barra-oferta, .amostra-oferta { background: var(--cor-oferta); }
+.amostra { display: inline-block; width: .9rem; height: .9rem; border-radius: 3px; vertical-align: middle; }
+
+.contador { font-size: .8rem; color: #5a5a5a; }
+.rodape { background: #2a2a2a; color: #e6e6e6; }
+.rodape a { color: #fff; }
+
+/* ---------- Alto contraste (ativado pela barra de acessibilidade) ---------- */
+html.alto-contraste body, html.alto-contraste .card, html.alto-contraste .destaque,
+html.alto-contraste .table, html.alto-contraste .table > :not(caption) > * > *,
+html.alto-contraste .navbar-principal, html.alto-contraste .rodape, html.alto-contraste .barra-acessibilidade,
+html.alto-contraste .form-control, html.alto-contraste .form-select, html.alto-contraste .opcoes-chips .form-check {
+  background: #000 !important; color: #fff !important; border-color: #fff !important;
+}
+html.alto-contraste a, html.alto-contraste .nav-link, html.alto-contraste .btn-link,
+html.alto-contraste .link-titulo, html.alto-contraste .breadcrumb-item.active { color: #ffeb3b !important; }
+html.alto-contraste .text-body-secondary, html.alto-contraste .form-text, html.alto-contraste .numeros dt { color: #fff !important; }
+html.alto-contraste .badge, html.alto-contraste .chip, html.alto-contraste .btn {
+  background: #000 !important; color: #fff !important; border: 1px solid #fff !important;
+}
+html.alto-contraste .barra { background: #ffeb3b !important; }
+html.alto-contraste .barra-oferta { background: #4dd0e1 !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+  .cartao-projeto:hover { transform: none; }
+}

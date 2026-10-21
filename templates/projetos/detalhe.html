@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block titulo %}{{ projeto.titulo }}{% endblock %}
+{% block conteudo %}
+<nav aria-label="Trilha de navegação">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'projetos:lista' %}">Projetos</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ projeto.titulo|truncatechars:50 }}</li>
+  </ol>
+</nav>
+
+<div class="row g-4">
+  <article class="col-lg-8" aria-labelledby="titulo-projeto">
+    <div class="d-flex flex-wrap gap-1 mb-2">
+      <span class="badge rounded-pill etiqueta-tipo">{{ projeto.get_tipo_display }}</span>
+      <span class="badge rounded-pill etiqueta-status status-{{ projeto.status }}">{{ projeto.get_status_display }}</span>
+    </div>
+    <h1 id="titulo-projeto" class="h2 fw-bold">{{ projeto.titulo }}</h1>
+    <p class="lead">{{ projeto.resumo }}</p>
+    <p class="text-body-secondary small">
+      Publicado por <a href="{% url 'contas:perfil' projeto.autor.username %}">{{ projeto.autor.get_full_name|default:projeto.autor.username }}</a>
+      em <time datetime="{{ projeto.criado_em|date:'c' }}">{{ projeto.criado_em|date:"d/m/Y" }}</time>
+    </p>
+
+    {% if eh_autor %}
+    <div class="d-flex gap-2 mb-4">
+      <a href="{% url 'projetos:editar' projeto.pk %}" class="btn btn-outline-secondary btn-sm">Editar projeto</a>
+      <a href="{% url 'projetos:excluir' projeto.pk %}" class="btn btn-outline-danger btn-sm">Excluir</a>
+    </div>
+    {% endif %}
+
+    <section class="mb-4" aria-labelledby="sec-descricao">
+      <h2 id="sec-descricao" class="h5">Sobre a ideia</h2>
+      <div class="texto-longo">{{ projeto.descricao|linebreaks }}</div>
+    </section>
+    <section class="mb-4" aria-labelledby="sec-objetivo">
+      <h2 id="sec-objetivo" class="h5">Objetivo</h2>
+      <div class="texto-longo">{{ projeto.objetivo|linebreaks }}</div>
+    </section>
+    <section class="mb-4" aria-labelledby="sec-competencias">
+      <h2 id="sec-competencias" class="h5">Competências procuradas</h2>
+      {% if projeto.competencias_desejadas.all %}
+      <ul class="list-unstyled d-flex flex-wrap gap-2">
+        {% for c in projeto.competencias_desejadas.all %}
+        <li><a class="chip chip-link" href="{% url 'projetos:lista' %}?competencia={{ c.slug }}">{{ c.nome }}</a></li>
+        {% endfor %}
+      </ul>
+      {% else %}<p class="text-body-secondary">O autor não indicou competências específicas — todos são bem-vindos.</p>{% endif %}
+    </section>
+
+    {% if eh_autor %}
+    <section class="mb-4" aria-labelledby="sec-pendentes">
+      <h2 id="sec-pendentes" class="h5">Interessados aguardando resposta <span class="badge text-bg-secondary">{{ pendentes|length }}</span></h2>
+      {% for interesse in pendentes %}
+      <div class="card mb-3">
+        <div class="card-body">
+          {% with perfil=interesse.estudante.perfil %}
+          <h3 class="h6 mb-1"><a href="{% url 'contas:perfil' interesse.estudante.username %}">{{ perfil.nome_exibicao }}</a></h3>
+          <p class="small text-body-secondary mb-2">{{ perfil.curso|default:"Curso não informado" }}{% if perfil.polo %} · Polo {{ perfil.polo }}{% endif %}</p>
+          {% if perfil.competencias.all %}
+          <p class="small mb-2"><span class="fw-semibold">Competências:</span> {{ perfil.competencias.all|join:", " }}</p>
+          {% endif %}
+          {% endwith %}
+          {% if interesse.mensagem %}<blockquote class="mensagem-interesse">{{ interesse.mensagem|linebreaksbr }}</blockquote>{% endif %}
+          <form method="post" action="{% url 'projetos:responder_interesse' interesse.pk %}" class="d-flex gap-2">
+            {% csrf_token %}
+            <button name="acao" value="aceitar" class="btn btn-success btn-sm" {% if projeto.vagas_restantes == 0 %}disabled{% endif %}>Aceitar na equipe<span class="visually-hidden">: {{ interesse.estudante.username }}</span></button>
+            <button name="acao" value="recusar" class="btn btn-outline-secondary btn-sm">Recusar<span class="visually-hidden">: {{ interesse.estudante.username }}</span></button>
+          </form>
+        </div>
+      </div>
+      {% empty %}
+      <p class="text-body-secondary">Nenhum pedido pendente no momento.</p>
+      {% endfor %}
+    </section>
+    {% endif %}
+  </article>
+
+  <aside class="col-lg-4" aria-label="Participação e equipe">
+    <div class="card painel-lateral mb-4">
+      <div class="card-body">
+        <h2 class="h5">Participar</h2>
+        <p class="mb-3"><strong>{{ projeto.vagas_restantes }}</strong> de {{ projeto.vagas }} vaga{{ projeto.vagas|pluralize }} disponíve{{ projeto.vagas_restantes|pluralize:"l,is" }}</p>
+
+        {% if not user.is_authenticated %}
+          <p>Entre na plataforma para manifestar interesse.</p>
+          <a class="btn btn-primario w-100" href="{% url 'login' %}?next={{ request.path }}">Entrar para participar</a>
+        {% elif eh_autor %}
+          <p class="text-body-secondary mb-0">Você é o autor deste projeto. Responda aos interessados na seção “Interessados aguardando resposta”.</p>
+        {% elif meu_interesse %}
+          <p class="mb-2">Seu pedido: <span class="badge status-interesse-{{ meu_interesse.status }}">{{ meu_interesse.get_status_display }}</span></p>
+          {% if meu_interesse.status == "pendente" %}
+          <form method="post" action="{% url 'projetos:cancelar_interesse' meu_interesse.pk %}">{% csrf_token %}
+            <button class="btn btn-outline-secondary btn-sm">Retirar interesse</button>
+          </form>
+          {% endif %}
+        {% elif projeto.aceita_interesse %}
+          <form method="post" action="{% url 'projetos:manifestar_interesse' projeto.pk %}" id="form-interesse" data-api="{% url 'api:projeto-interesse' projeto.pk %}">
+            {% csrf_token %}
+            {% include "includes/campo.html" with campo=form_interesse.mensagem %}
+            <button type="submit" class="btn btn-primario w-100">Tenho interesse em participar</button>
+          </form>
+        {% else %}
+          <p class="text-body-secondary mb-0">Este projeto não está recebendo novos interessados.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h5">Equipe</h2>
+        <ul class="list-unstyled mb-0 lista-equipe">
+          <li>
+            <a href="{% url 'contas:perfil' projeto.autor.username %}">{{ projeto.autor.get_full_name|default:projeto.autor.username }}</a>
+            <span class="badge text-bg-light">autor</span>
+            {% if contato_autor_visivel %}<div class="small text-body-secondary">Contato: {{ projeto.autor.perfil.contato|default:projeto.autor.email }}</div>{% endif %}
+          </li>
+          {% for m in membros %}
+          <li>
+            <a href="{% url 'contas:perfil' m.usuario.username %}">{{ m.usuario.get_full_name|default:m.usuario.username }}</a>
+            {% if m.contato %}<div class="small text-body-secondary">Contato: {{ m.usuario.perfil.contato|default:m.usuario.email }}</div>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% if not membros %}<p class="small text-body-secondary mt-2 mb-0">Ninguém entrou na equipe ainda.</p>{% endif %}
+        {% if eh_autor and membros %}<p class="small text-body-secondary mt-2 mb-0">Os contatos ficam visíveis apenas entre os membros da equipe.</p>{% endif %}
+      </div>
+    </div>
+  </aside>
+</div>
+{% endblock %}

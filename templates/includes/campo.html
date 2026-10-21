@@ -1,0 +1,36 @@
+{% load form_extras %}
+{% with tipo=campo|tipo_widget %}
+{% if tipo == "CheckboxSelectMultiple" %}
+<fieldset class="mb-3" {% if campo.help_text or campo.errors %}aria-describedby="{% if campo.help_text %}{{ campo.auto_id }}_ajuda{% endif %}{% if campo.errors %} {{ campo.auto_id }}_erro{% endif %}"{% endif %}>
+  <legend class="form-label fs-6 fw-semibold">{{ campo.label }}</legend>
+  <div class="opcoes-chips">
+    {% for opcao in campo %}
+      <div class="form-check">
+        {{ opcao.tag }}
+        <label class="form-check-label" for="{{ opcao.id_for_label }}">{{ opcao.choice_label }}</label>
+      </div>
+    {% empty %}
+      <p class="text-body-secondary small mb-0">Nenhuma opção cadastrada ainda.</p>
+    {% endfor %}
+  </div>
+  {% if campo.help_text %}<div id="{{ campo.auto_id }}_ajuda" class="form-text">{{ campo.help_text }}</div>{% endif %}
+  {% if campo.errors %}<div id="{{ campo.auto_id }}_erro" class="invalid-feedback d-block">{{ campo.errors|join:" " }}</div>{% endif %}
+</fieldset>
+{% elif tipo == "CheckboxInput" %}
+<div class="form-check mb-3">
+  {{ campo|campo_acessivel:"form-check-input" }}
+  <label class="form-check-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+  {% if campo.help_text %}<div id="{{ campo.auto_id }}_ajuda" class="form-text">{{ campo.help_text }}</div>{% endif %}
+  {% if campo.errors %}<div id="{{ campo.auto_id }}_erro" class="invalid-feedback d-block">{{ campo.errors|join:" " }}</div>{% endif %}
+</div>
+{% else %}
+<div class="mb-3">
+  <label class="form-label fw-semibold" for="{{ campo.id_for_label }}">
+    {{ campo.label }}{% if campo.field.required %} <span class="text-danger" aria-hidden="true">*</span><span class="visually-hidden">(obrigatório)</span>{% endif %}
+  </label>
+  {% if tipo == "Select" %}{{ campo|campo_acessivel:"form-select" }}{% else %}{{ campo|campo_acessivel }}{% endif %}
+  {% if campo.help_text %}<div id="{{ campo.auto_id }}_ajuda" class="form-text">{{ campo.help_text|safe }}</div>{% endif %}
+  {% if campo.errors %}<div id="{{ campo.auto_id }}_erro" class="invalid-feedback d-block">{{ campo.errors|join:" " }}</div>{% endif %}
+</div>
+{% endif %}
+{% endwith %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block titulo %}Excluir projeto{% endblock %}
+{% block conteudo %}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <h1 class="h3 fw-bold">Excluir “{{ object.titulo }}”?</h1>
+    <p>O projeto e todos os pedidos de participação ligados a ele serão removidos. Esta ação não pode ser desfeita.</p>
+    <form method="post" class="d-flex gap-2">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Sim, excluir</button>
+      <a href="{{ object.get_absolute_url }}" class="btn btn-outline-secondary">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
