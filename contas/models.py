@@ -42,7 +42,9 @@ class Perfil(models.Model):
         max_length=200, blank=True,
         help_text="Temas que interessam a você, separados por vírgula.",
     )
-    competencias = models.ManyToManyField(Competencia, blank=True, related_name="perfis")
+    competencias = models.ManyToManyField(
+        Competencia, blank=True, related_name="perfis", verbose_name="competências"
+    )
     contato = models.CharField(
         "forma de contato", max_length=120, blank=True,
         help_text="E-mail, WhatsApp ou outro canal. Só é exibido para quem forma equipe com você.",
